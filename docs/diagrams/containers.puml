@@ -1,0 +1,50 @@
+@startuml containers
+
+title "Архитектура трекера"
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_LANDSCAPE()
+LAYOUT_WITH_LEGEND()
+
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+
+!includeurl ICONURL/common.puml
+!includeurl ICONURL/devicons/postgresql.puml
+!includeurl ICONURL/devicons/python.puml
+!includeurl ICONURL/devicons/react.puml
+!includeurl ICONURL/devicons2/apache.puml
+!includeurl ICONURL/font-awesome-5/database.puml
+
+Person(user, "Пользователь")
+
+Container(web, "Трекер", "React", "Веб-интерфейс", react)
+
+Container(gateway, "Gateway", "FastAPI / Flask", "Отвечает за пользовательское API, регистрацию и аутентификацию.", python)
+DEV_POSTGRESQL(users, "User", database)
+
+Container(aggregator, "Aggregator", "FastAPI / Flask", "Сервис статистики для подсчета лайков и просмотров.", python)
+FA5_DATABASE(statistics, "Statistics", database)
+
+Container(manager, "Manager", "FastAPI / Flask", "Сервис задач и комментариев.", python)
+DEV_POSTGRESQL(engine, "Engine", database)
+
+ContainerQueue(topic, "Views Topic", "Apache Kafka", "События с лайками и просмотрами", "apache")
+
+Rel(user, web, "Управляет задачами. Оставляет реакции. Собирает статистику.")
+
+Rel(web, gateway, "Вызов методов", "REST")
+
+Rel(gateway, aggregator, "Собирает статистику", "gRPC")
+Rel(gateway, manager, "Управляет задачами и реакциями", "gRPC")
+Rel(gateway, users, "Модерация пользователей")
+
+Rel(aggregator, statistics, "Хранит и вычисляет статистику")
+
+Rel(manager, engine, "Обновляет задачи и комментарии")
+Rel(manager, topic, "Пишет в топик")
+
+Rel(topic, aggregator, "Читает топик")
+
+@enduml
