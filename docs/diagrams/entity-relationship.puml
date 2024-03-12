@@ -1,0 +1,55 @@
+@startuml entity-relationship
+
+entity user.user {
+  * id: serial
+  * name: varchar
+  * surname: varchar
+  * email: varchar
+  * password: varchar
+  * created_at: datetime
+}
+
+entity engine.task {
+    * id: serial
+    * author: int
+    * title: varchar
+    * description: varchar
+    * status: enum
+    * created_at: datetime
+    * starts_at: datetime
+    * finishes_at: datetime
+}
+
+entity engine.comment {
+    * id: serial
+    * author: int
+    * task: int
+    * text: varchar
+    * replies_to: int | null
+    * timestamp: datetime
+}
+
+entity statistics.like {
+    * id: serial
+    * author: int
+    * task: int
+    * timestamp: datetime
+}
+
+entity statistics.views {
+    * id: serial
+    * task: int
+    * timestamp: datetime
+}
+
+user.user ||--o{ engine.task
+user.user ||--o{ engine.comment
+user.user ||--o{ statistics.like
+
+engine.comment ||--o| engine.comment
+
+engine.task ||--o{ engine.comment
+engine.task ||--o{ statistics.like
+engine.task ||--o{ statistics.views
+
+@enduml

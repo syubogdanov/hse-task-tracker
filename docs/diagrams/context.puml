@@ -1,0 +1,16 @@
+@startuml context
+
+title "Диаграмма контекста"
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_LANDSCAPE()
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Пользователь")
+
+System(tracker, "Трекер", "Хранит данные о задачах, сроках и статусах.")
+
+Rel(user, tracker, "Управляет задачами. Оставляет реакции. Собирает статистику.")
+
+@enduml
