@@ -1,0 +1,67 @@
+version: "3"
+services:
+
+  database:
+    command:
+      - "-h ${DATABASE_HOST:?}"
+      - "-p ${DATABASE_PORT:?}"
+    environment:
+      - POSTGRES_DB=${DATABASE_DATABASE:?}
+      - POSTGRES_USER=${DATABASE_USERNAME:?}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:?}
+    healthcheck:
+      test: >
+        pg_isready
+        -U ${DATABASE_USERNAME:?}
+        -d ${DATABASE_DATABASE:?}
+        -h ${DATABASE_HOST:?}
+        -p ${DATABASE_PORT:?}
+      interval: 3s
+      timeout: 5s
+      retries: 5
+    hostname: ${DATABASE_HOST:?}
+    image: postgres
+
+  migrations:
+    build:
+      args:
+        - DIALECT=postgresql
+        - DATABASE=${DATABASE_DATABASE:?}
+        - USERNAME=${DATABASE_USERNAME:?}
+        - PASSWORD=${DATABASE_PASSWORD:?}
+        - HOST=${DATABASE_HOST:?}
+        - PORT=${DATABASE_PORT:?}
+      context: migrations/
+      dockerfile: Dockerfile
+    depends_on:
+      database:
+        condition:
+          service_healthy
+
+  service:
+    build:
+      args:
+        - DATABASE_DIALECT=postgresql
+        - DATABASE_DRIVER=asyncpg
+        - DATABASE_DATABASE=${DATABASE_DATABASE:?}
+        - DATABASE_USERNAME=${DATABASE_USERNAME:?}
+        - DATABASE_PASSWORD=${DATABASE_PASSWORD:?}
+        - DATABASE_HOST=${DATABASE_HOST:?}
+        - DATABASE_PORT=${DATABASE_PORT:?}
+        - SERVICE_HOST=${SERVICE_HOST:?}
+        - SERVICE_PORT=${SERVICE_PORT:?}
+      context: service/
+      dockerfile: Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    hostname: ${SERVICE_HOST:?}
+
+
+
+
+
+    ports:
+      - ${SERVICE_PORT:?}:${SERVICE_PORT:?}

@@ -1,0 +1,102 @@
+databaseChangeLog:
+- changeSet:
+    id: 1
+    author: syubogdanov
+    changes:
+    - createTable:
+        tableName: contact
+        columns:
+        - column:
+            name: id
+            type: int
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+        - column:
+            name: user
+            type: int
+            autoIncrement: true
+            constraints:
+              nullable: false
+              unique: false 
+        - column:
+            name: name
+            type: varchar
+            constraints:
+              nullable: true
+              unique: false
+        - column:
+            name: surname
+            type: varchar
+            constraints:
+              nullable: true
+              unique: false
+        - column:
+            name: birthday
+            type: date
+            constraints:
+              nullable: true
+              unique: false
+        - column:
+            name: email
+            type: varchar
+            constraints:
+              nullable: true
+              unique: false
+        - column:
+            name: phone
+            type: varchar
+            constraints:
+              nullable: true
+              unique: false
+        - column:
+            name: updated_at
+            type: timestamp
+            constraints:
+              nullable: false
+              unique: false
+    - createTable:
+        tableName: password
+        columns:
+        - column:
+            name: id
+            type: int
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+        - column:
+            name: user
+            type: int
+            constraints:
+              nullable: false
+              unique: true
+        - column:
+            name: md5
+            type: varchar
+            constraints:
+              nullable: false
+              unique: false
+        - column:
+            name: sha256
+            type: varchar
+            constraints:
+              nullable: false
+              unique: false
+    - createTable:
+        tableName: user
+        columns:
+        - column:
+            name: id
+            type: int
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+        - column:
+            name: username
+            type: varchar
+            constraints:
+              nullable: false
+              unique: true
