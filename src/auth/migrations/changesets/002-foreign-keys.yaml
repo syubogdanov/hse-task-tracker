@@ -1,0 +1,17 @@
+databaseChangeLog:
+- changeSet:
+    id: 2
+    author: syubogdanov
+    changes:
+    - addForeignKeyConstraint:
+        baseTableName: contact
+        baseColumnNames: user
+        referencedTableName: user
+        referencedColumnNames: id
+        constraintName: fk_contact_user
+    - addForeignKeyConstraint:
+        baseTableName: password
+        baseColumnNames: user
+        referencedTableName: user
+        referencedColumnNames: id
+        constraintName: fk_password_user
