@@ -58,10 +58,5 @@ services:
       migrations:
         condition: service_completed_successfully
     hostname: ${SERVICE_HOST:?}
-
-
-
-
-
     ports:
       - ${SERVICE_PORT:?}:${SERVICE_PORT:?}

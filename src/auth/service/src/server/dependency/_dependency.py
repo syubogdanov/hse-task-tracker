@@ -1,27 +1,35 @@
 from collections.abc import AsyncGenerator
-from collections.abc import Callable
-
-from typing import TypeVar
-from typing import Type
 
 from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
+
+from fastapi.security import APIKeyCookie
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database.core import DeclarativeBase
-from src.database.repository import Repository
 from src.database.session import AsyncSessionMaker
 
+from src.server.cookie import Cookie
 
-Model = TypeVar("Model", bound=DeclarativeBase)
+
+CookieSheme = APIKeyCookie(name=Cookie.cookiename())
 
 
 async def on_session() -> AsyncGenerator[AsyncSession, None]:
-    async with AsyncSessionMaker() as async_session:
-        yield async_session
+    async with AsyncSessionMaker() as session:
+        yield session
 
 
-def on_repository(prototype: Type[Model]) -> Callable[[AsyncSession], Repository[Model]]:
-    def dependency(session: AsyncSession = Depends(on_session)) -> Repository[Model]:
-        return Repository(prototype, session)
-    return dependency
+async def on_cookie(token: str = Depends(CookieSheme)) -> AsyncGenerator[Cookie, None]:
+    try:
+        cookie = Cookie.decode(token)
+        assert await cookie.exists()
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The cookie is broken or expired",
+        )
+
+    yield cookie

@@ -1,0 +1,207 @@
+---
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  /signup:
+    post:
+      summary: On Signup
+      description: |-
+        Creates a new user in the task tracker
+
+        Args:
+        - `username`: the username that will be used in the system
+        - `password`: the password that will be associated with the user
+
+        Status:
+        - `201`: the user has been successfully created
+        - `409`: the username is already taken
+
+        Headers:
+        - `Set-Cookie`: the token for future authorization
+      operationId: on_signup_signup_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /login:
+    post:
+      summary: On Login
+      description: |-
+        Authorizes in the task tracker
+
+        Args:
+        - `username`: the username that is used in the system
+        - `password`: the password that is associated with the user
+
+        Status:
+        - `200`: OK
+        - `403`: the password is incorrect
+        - `404`: the user does not exist
+
+        Headers:
+        - `Set-Cookie`: the cookie for future authorization
+      operationId: on_login_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /update:
+    patch:
+      summary: On Update
+      description: |-
+        Updates the user personal information
+
+        Args:
+        - `name`: the user's name
+        - `surname`: the user's surname
+        - `bithday`: the user's birthday
+        - `email`: the user's email address
+        - `phone`: the user's mobile phone number
+
+        Status:
+        - `200`: OK
+        - `400`: the data is empty
+
+        Note:
+        - Requires the authorization cookie
+      operationId: on_update_update_patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+        - APIKeyCookie: []
+  /healthcheck:
+    get:
+      summary: On Healthcheck
+      operationId: on_healthcheck_healthcheck_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    Account:
+      properties:
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - username
+        - password
+      title: Account
+    Contact:
+      properties:
+        name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Name
+        surname:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Surname
+        birthday:
+          anyOf:
+            - type: string
+              format: date
+            - type: 'null'
+          title: Birthday
+        email:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Email
+        phone:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Phone
+      type: object
+      title: Contact
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+  securitySchemes:
+    APIKeyCookie:
+      type: apiKey
+      in: cookie
+      name: cookie

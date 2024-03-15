@@ -63,4 +63,4 @@ RUN openssl rsa \
     -pubout \
     -out $OPENSSL_PUB
 
-ENTRYPOINT python -m src.run
+ENTRYPOINT python -m src.server.run

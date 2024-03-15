@@ -1,25 +1,12 @@
-import functools
-
-from collections.abc import Callable
-
-from datetime import datetime
-from datetime import UTC
-
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import func
 
 from src.database.core import DeclarativeBase
-
-
-def utcnow() -> Callable[[], datetime.date]:
-    @functools.wraps(datetime.now)
-    def wrapper():
-        return datetime.now(UTC)
-    return wrapper
 
 
 class User(DeclarativeBase):
@@ -42,8 +29,7 @@ class Contact(DeclarativeBase):
 
     updated_at = Column(
         DateTime,
-        default=utcnow,
-        onupdate=utcnow,
+        onupdate=func.now(),
         unique=False,
         nullable=False,
     )
